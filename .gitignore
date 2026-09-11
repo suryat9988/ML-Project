@@ -334,3 +334,12 @@ ASALocalRun/
 out
 pkg
 debug
+
+# PulseLine
+apps/api/data/
+apps/web/dist/
+.venv/
+venv/
+*.db
+.env
+.env.local

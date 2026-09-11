@@ -1,104 +1,66 @@
-# Try Out Development Containers: Go
+# PulseLine
 
-A **development container** is a running [Docker](https://www.docker.com) container with a well-defined tool/runtime stack and its prerequisites. You can try out development containers with **[GitHub Codespaces](https://github.com/features/codespaces)** or **[Visual Studio Code Remote - Containers](https://aka.ms/vscode-remote/containers)**.
+Walk-in clinic **digital queue** and **front-desk assistant** for a demo urgent-care site (PulseLine Urgent Care, Chicago). Patients check in from a phone, keep a live token, and ask hours/parking/wait questions. Staff call the next patient, start a visit, mark complete or no-show, and pause the line.
 
-This is a sample project that lets you try out either option in a few easy steps. We have a variety of other [vscode-remote-try-*](https://github.com/search?q=org%3Amicrosoft+vscode-remote-try-&type=Repositories) sample projects, too.
+This is **not medical advice** and **not an ER**. Emergencies go to 911.
 
-> **Note:** If you already have a Codespace or dev container, you can jump to the [Things to try](#things-to-try) section.
+```
+Browser (React) → FastAPI → SQLite
+```
 
-## Setting up the development container
+Same shape as [CaseDraft](https://github.com/suryat9988/casedraft): structured intake, stub “AI” behind an API, human staff still run the queue.
 
-### GitHub Codespaces
-Follow these steps to open this sample in a Codespace:
-1. Click the Code drop-down menu and select the **Open with Codespaces** option.
-1. Select **+ New codespace** at the bottom on the pane.
+## Run locally (two terminals)
 
-For more info, check out the [GitHub documentation](https://docs.github.com/en/free-pro-team@latest/github/developing-online-with-codespaces/creating-a-codespace#creating-a-codespace).
+API:
 
-### VS Code Remote - Containers
-Follow these steps to open this sample in a container using the VS Code Remote - Containers extension:
+```bash
+cd apps/api
+python -m pip install -r requirements.txt
+python -m uvicorn app.main:app --reload --port 8000
+```
 
-1. If this is your first time using a development container, please ensure your system meets the pre-reqs (i.e. have Docker installed) in the [getting started steps](https://aka.ms/vscode-remote/containers/getting-started).
+UI:
 
-2. To use this repository, you can either open the repository in an isolated Docker volume:
+```bash
+cd apps/web
+npm install
+npm run dev
+```
 
-    - Press <kbd>F1</kbd> and select the **Remote-Containers: Try a Sample...** command.
-    - Choose the "Go" sample, wait for the container to start, and try things out!
-        > **Note:** Under the hood, this will use the **Remote-Containers: Clone Repository in Container Volume...** command to clone the source code in a Docker volume instead of the local filesystem. [Volumes](https://docs.docker.com/storage/volumes/) are the preferred mechanism for persisting container data.
+Open http://localhost:5173 — Vite proxies `/api` to port 8000.
 
-   Or open a locally cloned copy of the code:
+Staff PIN for the board: **2468** (demo only).
 
-   - Clone this repository to your local filesystem.
-   - Press <kbd>F1</kbd> and select the **Remote-Containers: Open Folder in Container...** command.
-   - Select the cloned copy of this folder, wait for the container to start, and try things out!
-   
-## Things to try
+Seeded tokens so the board is not empty: Ana Ruiz is in visit (`A-101`); Jordan Blake and Priya Shah are waiting.
 
-Once you have this sample opened, you'll be able to work with it like you would locally.
+## Docker Compose
 
-> **Note:** This container runs as a non-root user with sudo access by default. Comment out `"remoteUser": "vscode"` in `.devcontainer/devcontainer.json` if you'd prefer to run as root.
+```bash
+docker compose up --build
+```
 
-Some things to try:
+Open http://localhost:8080
 
-1. **Edit:**
-   - Open `server.go`
-   - Try adding some code and check out the language features.
-   - Notice the Go extension is already installed in the container since the `.devcontainer/devcontainer.json` lists `"golang.Go"` as an extension to install automatically when the container is created.
-2. **Terminal:** Press <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\`</kbd> and type `uname` and other Linux commands from the terminal window.
-3. **Build, Run, and Debug:**
-   - Open `server.go`
-   - Add a breakpoint (e.g. on line 22).
-   - Press <kbd>F5</kbd> to launch the app in the container.
-   - Once the breakpoint is hit, try hovering over variables, examining locals, and more.   
-   - Continue (<kbd>F5</kbd>). You can connect to the server in the container by either: 
-        - Clicking on `Open in Browser` in the notification telling you: `Your service running on port 9000 is available`.
-        - Clicking the globe icon in the 'Ports' view. The 'Ports' view gives you an organized table of your forwarded ports, and you can get there by clicking on the "1" in the status bar, which means your app has 1 forwarded port.
-   - Notice port 9000 in the 'Ports' view is labeled "Hello Remote World." In `devcontainer.json`, you can set `"portsAttributes"`, such as a label for your forwarded ports and the action to be taken when the port is autoforwarded.
+## Tests / CI
 
-   > **Note:** In Remote - Containers, you can access your app at `http://localhost:9000` in a local browser. But in a browser-based Codespace, you must click the link from the notification or the `Ports` view so that the service handles port forwarding in the browser and generates the correct URL.
-   
-4. **Rebuild or update your container:** 
+```bash
+cd apps/api && pytest
+cd apps/web && npm run build
+```
 
-   You may want to make changes to your container, such as installing a different version of a software or forwarding a new port. You'll rebuild your container for your changes to take effect. 
+GitHub Actions runs both on pull requests (`.github/workflows/ci.yml`).
 
-   **Open browser automatically:** As an example change, let's update the `portsAttributes` in the `.devcontainer/devcontainer.json` file to open a browser when our port is automatically forwarded.
-   
-   - Open the `.devcontainer/devcontainer.json` file.
-   - Modify the `"onAutoForward"` attribute in your `portsAttributes` from `"notify"` to `"openBrowser"`.
-   - Press <kbd>F1</kbd> and select the **Remote-Containers: Rebuild Container** or **Codespaces: Rebuild Container** command so the modifications are picked up.
-5. **Refactoring - rename:**
-    - Open `hello.go`, select method name `Hello` press <kbd>F1</kbd> and run the **Rename Symbol** command.
-6. **Refactoring - extract:**
-   - Open `hello.go` and select string, press <kbd>F1</kbd> and run the **Go: Extract to variable** command.
-   - Open `hello.go` and select line with return statement, press <kbd>F1</kbd> and run the **Go: Extract to function** command.
-7. **Generate tests:**
-    - Open `hello.go` and press <kbd>F1</kbd> and run the **Go: Generate Unit Tests For File** command.
-    - Implement a test case: Open file `hello_test.go` and edit the line with the `TODO` comment: `{"hello without name", "Hello, "},` 
-    - You can toggle between implementation file and test file with press <kbd>F1</kbd> and run the **Go: Toggle Test File**
-    - Tests can also run as benchmarks: Open file `hello_test.go`, press <kbd>F1</kbd> and run the **Go: Benchmark File**
-8. **Stub generation:** ( [details](https://github.com/josharian/impl))
-   - define a struct `type mock struct {}`, enter a new line , press <kbd>F1</kbd> and run the **Go: Generate interface stubs** command.
-   - edit command `m *mock http.ResponseWriter`
-9. **Fill structs:** ([details](https://github.com/davidrjenni/reftools/tree/master/cmd/fillstruct))
-   - Open `hello.go` and select `User{}` of variable asignment, press <kbd>F1</kbd> and run the **Go: Fill struct** command.
-10. **Add json tags to structs:** ([details](https://github.com/fatih/gomodifytags))
-   - Open `hello.go` and go with cursor in to a struct, press <kbd>F1</kbd> and run the **Go: Add Tags To Struct Fields** command.
+## What it does
 
-## Contributing
+| Role | Flow |
+| --- | --- |
+| Patient | Check in → token stub with position and ETA → live refresh → chat with desk |
+| Staff | PIN gate → call next / call a specific token → start visit → complete or no-show → pause/resume |
+| Desk bot | Hours, wait, parking, insurance, what to bring. Symptom questions are deflected. “Chest pain” / can’t breathe routes to 911. |
 
-This project welcomes contributions and suggestions. Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.microsoft.com.
+Wait time is a simple `people ahead × 12 minutes` (clinic `minutesPerVisit`). No PHI store beyond the demo names and phone numbers you type.
 
-When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+## Repo note
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-
-## License
-
-Copyright © Microsoft Corporation All rights reserved.<br />
-Licensed under the MIT License. See LICENSE in the project root for license information.
+This Cloud Agent run was started against `suryat9988/ML-Project` (an old VS Code Go sample). The intended GitHub repo is [`suryat9988/PulseLine`](https://github.com/suryat9988/PulseLine), which was empty at the time. Copy this tree there, or start a new agent with PulseLine selected, if you want the history on that remote. The original Go hello-world files are left in place.
