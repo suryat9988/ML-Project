@@ -1,0 +1,25 @@
+services:
+  api:
+    build: ./apps/api
+    environment:
+      DATABASE_PATH: /data/pulseline.db
+    volumes:
+      - pulseline-data:/data
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build: ./apps/web
+    ports:
+      - "8080:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pulseline-data:
