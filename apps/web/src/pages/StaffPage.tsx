@@ -184,7 +184,7 @@ export function StaffPage() {
                   <td>{t.patientName}</td>
                   <td>{t.reasonLabel}</td>
                   <td>{t.providerName}</td>
-                  <td>~{t.etaMinutes} min</td>
+                  <td>{t.position === 0 ? "Next" : `~${t.etaMinutes} min`}</td>
                   <td>
                     <button
                       type="button"
